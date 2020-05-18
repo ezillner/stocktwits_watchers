@@ -1,0 +1,62 @@
+from matplotlib import pyplot as plt
+from lxml import html
+import requests
+import datetime
+import time
+import pandas as pd
+import openpyxl
+
+
+date =datetime.date.today()
+tickers =['UAVS','GNUS','RNWK', 'KTOV',] 
+watchers_new =[]
+tickers_and_watchers ={}
+end_date = datetime.date(2020, 5, 17)
+print(date)
+
+while date <= datetime.date(2020,5,18):
+	date =datetime.date.today()
+#adds ticker key to dictionary if it doesn't exist
+	def create_dictionary(tickers):
+		for ticker in tickers:
+			if ticker not in tickers_and_watchers.keys():
+				tickers_and_watchers[ticker]=[]
+				print (ticker +" was added!")
+
+
+
+	#This scrapes the amount of watchers from stocktwits
+	def update_watchers(tickers):
+
+		for ticker in tickers:
+
+			#print(ticker)
+			page = requests.get('https://stocktwits.com/symbol/'+ticker)
+			#print(page)
+			tree = html.fromstring(page.content)
+
+			watchers = tree.xpath('//div[@class="st_HebiDD2 st_yCtClNI st_2mehCkH st_3PPn_WF"]/strong[1]/text()')
+			
+			
+			tickers_and_watchers[ticker].append(watchers)
+			
+			
+			
+
+	
+		#watchers_new.append(watchers)
+
+		
+		#print(watchers_new)
+
+	
+	create_dictionary(tickers)
+	update_watchers(tickers)
+	pd.DataFrame(tickers_and_watchers).to_excel('watchers_export_1.xlsx')
+
+
+	print(tickers_and_watchers)
+	time.sleep(1800)
+
+
+
